@@ -4,7 +4,7 @@ import { createAuth } from './auth.js';
 import { createItemsRouter } from './items.js';
 import { createUploader } from './uploads.js';
 
-export function createApp({ db, pin, uploadsDir, maxUploadBytes, broadcast }) {
+export function createApp({ db, pin, uploadsDir, maxUploadBytes, broadcast = () => {}, sseHandler }) {
   const app = express();
   app.set('trust proxy', true);
   app.use(express.json({ limit: '1mb' }));
@@ -44,6 +44,10 @@ export function createApp({ db, pin, uploadsDir, maxUploadBytes, broadcast }) {
       if (err) res.status(404).json({ error: 'not_found' });
     });
   });
+
+  if (sseHandler) {
+    app.get('/api/events', auth.requireAuth, sseHandler);
+  }
 
   return app;
 }
