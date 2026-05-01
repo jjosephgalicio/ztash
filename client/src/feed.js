@@ -1,6 +1,7 @@
 import { api } from './api.js';
 import { renderCard } from './render.js';
 import { toast } from './toast.js';
+import { icon } from './icons.js';
 
 export function setupFeed({ lightbox }) {
   const feed = document.getElementById('feed');
@@ -97,7 +98,7 @@ export function setupFeed({ lightbox }) {
   viewToggle.addEventListener('click', () => {
     isGrid = !isGrid;
     feed.classList.toggle('grid', isGrid);
-    viewToggle.textContent = isGrid ? '☰' : '⊞';
+    viewToggle.replaceChildren(icon(isGrid ? 'list' : 'layout-grid'));
     if (isGrid) {
       // auto-activate Images filter
       chips.forEach((c) => c.classList.toggle('active', c.dataset.filter === 'image'));

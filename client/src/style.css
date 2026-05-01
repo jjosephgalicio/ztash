@@ -1,23 +1,28 @@
 :root {
-  --bg: #0b0c10;
-  --surface: #15171c;
-  --surface-2: #1c1f26;
-  --border: #23262d;
-  --text: #e6e8ea;
-  --muted: #8a8f98;
-  --accent: #6366f1;
-  --accent-hover: #7c7fff;
+  --bg: #0f1115;
+  --surface: #1c1f27;
+  --surface-2: #262a34;
+  --border: #3a3f4d;
+  --text: #f0f2f6;
+  --muted: #9ca3af;
+  --accent: #818cf8;
+  --accent-hover: #a5b4fc;
   --danger: #ef4444;
   --good: #10b981;
   --radius: 8px;
   --radius-lg: 12px;
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
   font-family: -apple-system, "Segoe UI", Inter, system-ui, sans-serif; font-size: 14px; }
 body { min-height: 100vh; }
-body[hidden] { display: none; }
+
+/* The HTML `hidden` attribute must win over per-class display rules
+ * (e.g. .lightbox sets `display: grid`, which would otherwise override
+ * the attribute and leave the overlay permanently visible). */
+[hidden] { display: none !important; }
 
 .muted { color: var(--muted); }
 
@@ -27,7 +32,7 @@ body.screen-app .pin { display: none; }
 
 .pin { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
 .pin-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
-  padding: 32px; width: 100%; max-width: 360px; text-align: center; }
+  padding: 32px; width: 100%; max-width: 360px; text-align: center; box-shadow: var(--shadow-card); }
 .pin-card h1 { margin: 0 0 4px; font-size: 22px; }
 .pin-inputs { display: flex; gap: 8px; margin: 24px 0; justify-content: center; }
 .pin-inputs input { width: 40px; height: 48px; text-align: center; font-size: 20px;
@@ -55,7 +60,10 @@ body.screen-app .pin { display: none; }
 @media (max-width: 360px) { .actions { flex-direction: column; } }
 
 .btn { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 10px 16px; font-size: 14px; cursor: pointer; transition: background 150ms ease; font-weight: 500; }
+  padding: 10px 16px; font-size: 14px; cursor: pointer; transition: background 150ms ease; font-weight: 500;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.icon { flex-shrink: 0; display: inline-block; vertical-align: middle; }
+.view-toggle { display: inline-flex; align-items: center; justify-content: center; }
 .btn:hover { background: var(--surface-2); }
 .btn.primary { background: var(--accent); border-color: var(--accent); }
 .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }

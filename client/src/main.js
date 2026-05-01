@@ -4,12 +4,14 @@ import { setupComposer } from './composer.js';
 import { setupUpload } from './upload.js';
 import { setupFeed } from './feed.js';
 import { setupTimestampRefresh } from './render.js';
+import { applyIcons } from './icons.js';
 import { api } from './api.js';
 
 async function bootApp() {
   document.body.classList.remove('screen-pin');
   document.body.classList.add('screen-app');
   document.querySelector('.app').hidden = false;
+  applyIcons(document.querySelector('.app'));
 
   const lightbox = setupLightbox();
   const feed = setupFeed({ lightbox });
