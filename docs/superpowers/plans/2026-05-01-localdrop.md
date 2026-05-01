@@ -6,7 +6,7 @@
 
 **Architecture:** A single Node.js + Express server on the laptop persists items in SQLite and pushes updates over Server-Sent Events. A PWA client (Vite + vanilla JS) is served from the same origin, gated by a PIN cookie.
 
-**Tech Stack:** Node 20+, Express, better-sqlite3, multer, vitest (server tests), supertest (integration tests), Vite (client build), vanilla JS, plain CSS.
+**Tech Stack:** Node 22.5+, Express, `node:sqlite` (Node stdlib, no native build), multer, vitest (server tests), supertest (integration tests), Vite (client build), vanilla JS, plain CSS.
 
 **Spec:** [`docs/superpowers/specs/2026-05-01-localdrop-design.md`](../specs/2026-05-01-localdrop-design.md)
 
@@ -40,7 +40,6 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "better-sqlite3": "^11.3.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
@@ -335,10 +334,10 @@ describe('items repository', () => {
 Run: `npm test -- db`
 Expected: FAIL.
 
-- [ ] **Step 3: Implement `server/db.js`**
+- [ ] **Step 3: Implement `server/db.js`** (uses `node:sqlite` — built-in to Node 22.5+, no native build required)
 
 ```js
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { randomUUID } from 'node:crypto';
 
 const SCHEMA = `
@@ -356,8 +355,8 @@ CREATE INDEX IF NOT EXISTS idx_items_created_at ON items(created_at DESC);
 `;
 
 export function createDb(path) {
-  const db = new Database(path);
-  db.pragma('journal_mode = WAL');
+  const db = new DatabaseSync(path);
+  db.exec('PRAGMA journal_mode = WAL');
   db.exec(SCHEMA);
 
   const stmts = {
@@ -373,6 +372,7 @@ export function createDb(path) {
       SELECT * FROM items WHERE created_at < ? ORDER BY created_at DESC LIMIT ?
     `),
     remove: db.prepare(`DELETE FROM items WHERE id = ?`),
+    updateLinkTitle: db.prepare(`UPDATE items SET link_title = ? WHERE id = ?`),
   };
 
   return {
@@ -407,10 +407,15 @@ export function createDb(path) {
       remove(id) {
         return stmts.remove.run(id).changes > 0;
       },
+      updateLinkTitle(id, title) {
+        stmts.updateLinkTitle.run(title, id);
+      },
     },
   };
 }
 ```
+
+**Note on `node:sqlite`:** This is a Node.js stdlib module (stable since Node 22.5). The API is intentionally close to better-sqlite3 — synchronous, prepare/run/get/all — so the rest of the plan reads the same. The one caller-visible difference is `db.exec('PRAGMA …')` instead of `db.pragma(…)`.
 
 - [ ] **Step 4: Run tests — verify they pass**
 
@@ -1107,9 +1112,8 @@ async create(req, res) {
   if (type === 'link') {
     fetchTitleAsync(content).then((title) => {
       if (!title) return;
-      db.raw.prepare('UPDATE items SET link_title = ? WHERE id = ?').run(title, item.id);
-      const updated = { ...item, link_title: title };
-      broadcast('item:updated', updated);
+      db.items.updateLinkTitle(item.id, title);
+      broadcast('item:updated', { ...item, link_title: title });
     });
   }
 },
