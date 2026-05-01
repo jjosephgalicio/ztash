@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f1115" />
+  <title>Ztash — your phone and laptop, sharing a clipboard</title>
+  <meta name="description" content="Self-hosted clipboard for transferring images, text, links, and JSON between your phone and laptop on the same WiFi. Runs locally on your machine. No accounts, no cloud, no fees." />
+
+  <meta property="og:title" content="Ztash" />
+  <meta property="og:description" content="A self-hosted clipboard for your phone and laptop on the same WiFi." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ztash.netlify.app" />
+
+  <style>
+    :root {
+      --bg: #0f1115;
+      --surface: #1c1f27;
+      --surface-2: #262a34;
+      --border: #3a3f4d;
+      --text: #f0f2f6;
+      --muted: #9ca3af;
+      --accent: #818cf8;
+      --accent-hover: #a5b4fc;
+      --good: #10b981;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, "Segoe UI", Inter, system-ui, sans-serif;
+      font-size: 15px; line-height: 1.55;
+    }
+    body { min-height: 100vh; }
+
+    .container { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; letter-spacing: 0.01em; }
+    .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--good); animation: pulse 2.4s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+    .header-link { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .header-link:hover { color: var(--text); }
+
+    .hero h1 { font-size: 44px; line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; font-weight: 700; }
+    .hero h1 .accent { color: var(--accent); }
+    .hero p.lede { font-size: 18px; color: var(--muted); margin: 0 0 32px; max-width: 560px; }
+
+    .install-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px; margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+    .install-row { display: flex; align-items: center; gap: 8px; }
+    .install-cmd {
+      flex: 1; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 16px; color: var(--text);
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 14px; overflow-x: auto; white-space: nowrap;
+      user-select: all;
+    }
+    .install-cmd .prompt { color: var(--muted); user-select: none; margin-right: 6px; }
+    .copy-btn {
+      background: var(--accent); color: white; border: none; border-radius: 8px;
+      padding: 12px 16px; font-size: 14px; font-weight: 500; cursor: pointer;
+      transition: background 150ms ease;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover { background: var(--accent-hover); }
+    .copy-btn.copied { background: var(--good); }
+    .install-foot { margin-top: 10px; font-size: 13px; color: var(--muted); }
+    .install-foot code { background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+    section { margin-top: 56px; }
+    section h2 { font-size: 22px; margin: 0 0 20px; letter-spacing: -0.01em; }
+
+    .features { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 540px) { .features { grid-template-columns: 1fr; } }
+    .feature {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px;
+    }
+    .feature h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+    .feature p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .steps { counter-reset: step; padding: 0; margin: 0; list-style: none; }
+    .steps li {
+      counter-increment: step;
+      padding: 14px 16px 14px 56px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      margin-bottom: 10px; position: relative;
+      font-size: 15px;
+    }
+    .steps li::before {
+      content: counter(step);
+      position: absolute; left: 16px; top: 14px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent); color: white;
+      display: grid; place-items: center;
+      font-size: 13px; font-weight: 600;
+    }
+    .steps code {
+      background: var(--surface-2); padding: 2px 7px; border-radius: 4px;
+      font-family: ui-monospace, monospace; font-size: 13px; border: 1px solid var(--border);
+    }
+
+    footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--good);
+      padding: 10px 18px; border-radius: 8px; font-size: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      opacity: 0; pointer-events: none; transition: opacity 200ms ease;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand"><span class="brand-dot"></span> Ztash</div>
+      <a class="header-link" href="https://github.com/jjsquackers/ztash" target="_blank" rel="noopener">GitHub →</a>
+    </header>
+
+    <div class="hero">
+      <h1>Your phone and laptop,<br/>sharing a <span class="accent">clipboard</span>.</h1>
+      <p class="lede">
+        A self-hosted PWA for moving images, text, links, and JSON between your devices on the same WiFi.
+        Runs on your machine, uses your network, stores nothing in the cloud.
+      </p>
+
+      <div class="install-card">
+        <div class="install-row">
+          <div class="install-cmd"><span class="prompt">$</span><span id="cmd">npx ztash</span></div>
+          <button class="copy-btn" id="copy-btn" aria-label="Copy install command">Copy</button>
+        </div>
+        <div class="install-foot">
+          Requires <code>Node.js 22.5+</code>. First run prompts for a 4–6 digit PIN.
+        </div>
+      </div>
+    </div>
+
+    <section>
+      <h2>Why Ztash</h2>
+      <div class="features">
+        <div class="feature">
+          <h3>Your storage, your network</h3>
+          <p>Files live on your laptop. Traffic stays on your home WiFi. No cloud account, no monthly fee.</p>
+        </div>
+        <div class="feature">
+          <h3>Real-time sync</h3>
+          <p>Paste on your phone, it shows up on your laptop in under a second over Server-Sent Events.</p>
+        </div>
+        <div class="feature">
+          <h3>Type-aware cards</h3>
+          <p>Images, links, JSON, and plain text each render as their own card. Filter, copy, or download in one tap.</p>
+        </div>
+        <div class="feature">
+          <h3>Installable PWA</h3>
+          <p>Add to your phone's home screen and it feels like a native app. Dark theme, mobile-first, ~16 KB JS.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Get started in 60 seconds</h2>
+      <ol class="steps">
+        <li>Install <code>Node.js 22.5</code> or newer if you don't have it.</li>
+        <li>In a terminal on your laptop, run <code>npx ztash</code>. Set a 4–6 digit PIN when prompted.</li>
+        <li>Ztash prints two URLs — <code>http://localhost:4123</code> for your laptop, and a <code>http://192.168.x.x:4123</code> address for your phone.</li>
+        <li>Open the phone URL on your phone (same WiFi as the laptop), enter the PIN, and start sending.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>What's in the box</h2>
+      <div class="features">
+        <div class="feature">
+          <h3>PIN-gated</h3>
+          <p>Httponly cookie session, constant-time compare, rate-limited login attempts.</p>
+        </div>
+        <div class="feature">
+          <h3>SQLite, locally</h3>
+          <p>Items stored in <code>~/.ztash/ztash.sqlite</code>. Survives restarts. Delete the file to wipe everything.</p>
+        </div>
+        <div class="feature">
+          <h3>Open source</h3>
+          <p>MIT licensed. Audit it, fork it, customize it. The whole client is &lt;800 lines of vanilla JS.</p>
+        </div>
+        <div class="feature">
+          <h3>No service to break</h3>
+          <p>Nothing to deploy, nothing to pay for, nothing to go offline. Your laptop is the server.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>Ztash is MIT licensed. Made for personal use.</div>
+      <div>
+        <a href="https://github.com/jjsquackers/ztash" target="_blank" rel="noopener">Source</a> ·
+        <a href="https://github.com/jjsquackers/ztash/issues" target="_blank" rel="noopener">Issues</a>
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Copied to clipboard</div>
+
+  <script>
+    const cmd = document.getElementById('cmd').textContent;
+    const btn = document.getElementById('copy-btn');
+    const toast = document.getElementById('toast');
+
+    btn.addEventListener('click', async () => {
+      let ok = false;
+      try { await navigator.clipboard.writeText(cmd); ok = true; } catch {}
+      if (!ok) {
+        // Legacy fallback for non-secure contexts.
+        const ta = document.createElement('textarea');
+        ta.value = cmd;
+        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { ok = document.execCommand('copy'); } catch {}
+        document.body.removeChild(ta);
+      }
+      if (!ok) return;
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
+      toast.classList.add('show');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+        toast.classList.remove('show');
+      }, 1800);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Netlify only serves the static landing page. The actual Ztash server runs
+# on each user's machine via `npx ztash` — see https://github.com/jjsquackers/ztash.
+[build]
+  publish = "landing"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
