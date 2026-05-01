@@ -111,6 +111,7 @@ export function setupFeed({ lightbox }) {
     // 401 the server has been restarted (in-memory sessions wiped) and
     // we need to reload to show the PIN screen again.
     let probeTimer = null;
+    let networkToastShown = false;
     const cancelProbe = () => {
       if (probeTimer) { clearTimeout(probeTimer); probeTimer = null; }
     };
@@ -120,10 +121,22 @@ export function setupFeed({ lightbox }) {
         probeTimer = null;
         try {
           await api.listItems({ limit: 1 });
+          // Probe succeeded — SSE just hasn't reconnected yet. No action.
         } catch (err) {
           if (err.status === 401) {
+            // Session wiped (server restart). Reload to PIN screen.
             es.close();
             location.reload();
+            return;
+          }
+          if (!err.status && !networkToastShown) {
+            // Network error — server isn't reachable. Show a one-shot
+            // toast so the user has a clue beyond the gray dot.
+            networkToastShown = true;
+            toast(
+              "Lost connection to Ztash. Make sure the server is still running on your laptop.",
+              { error: true }
+            );
           }
         }
       }, 5000);
@@ -131,6 +144,7 @@ export function setupFeed({ lightbox }) {
     es.addEventListener('open', () => {
       connDot.classList.remove('disconnected');
       cancelProbe();
+      networkToastShown = false; // reset for the next disconnect
     });
     es.addEventListener('error', () => {
       connDot.classList.add('disconnected');
