@@ -1,6 +1,6 @@
 {
   "name": "@jjosephgalicio/ztash",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Self-hosted PWA for transferring images, text, links, and JSON between your phone and laptop on the same WiFi.",
   "keywords": [
     "clipboard",
@@ -22,7 +22,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "ztash": "bin/ztash.mjs"
+    "ztash": "bin/ztash.js"
   },
   "files": [
     "bin",
