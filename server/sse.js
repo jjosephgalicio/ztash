@@ -20,7 +20,14 @@ export function createSseHub() {
     res.flushHeaders();
     res.write(': connected\n\n');
 
-    broadcast('devices:changed', { count: clients.size + 1 });
+    // Tell the new client the current count directly (so its UI is correct
+    // immediately, without waiting for the next device change).
+    const newCount = clients.size + 1;
+    res.write(`event: devices:changed\ndata: ${JSON.stringify({ count: newCount })}\n\n`);
+
+    // Tell existing clients about the new device. Done before adding the new
+    // client to the set so it doesn't receive its own join event twice.
+    broadcast('devices:changed', { count: newCount });
     clients.add(res);
 
     const heartbeat = setInterval(() => {

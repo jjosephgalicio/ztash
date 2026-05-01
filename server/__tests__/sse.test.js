@@ -19,7 +19,7 @@ describe('SSE hub', () => {
     const cookie = auth.headers['set-cookie'][0];
 
     const events = [];
-    const events$ = new Promise((resolve) => {
+    const itemCreated$ = new Promise((resolve) => {
       const req = http.get(`http://127.0.0.1:${port}/api/events`, { headers: { Cookie: cookie } }, (res) => {
         let buffer = '';
         res.on('data', (chunk) => {
@@ -30,7 +30,7 @@ describe('SSE hub', () => {
             buffer = buffer.slice(idx + 2);
             if (block.startsWith('event:')) {
               events.push(block);
-              if (events.length === 1) resolve();
+              if (block.startsWith('event: item:created')) resolve();
             }
           }
         });
@@ -41,8 +41,8 @@ describe('SSE hub', () => {
     // Wait a tick for the SSE connection, then post.
     await new Promise(r => setTimeout(r, 100));
     await request(app).post('/api/items').set('Cookie', cookie).send({ content: 'hi' });
-    await events$;
-    expect(events[0]).toMatch(/event: item:created/);
+    await itemCreated$;
+    expect(events.some((e) => /^event: item:created/.test(e))).toBe(true);
     server.close();
   });
 
