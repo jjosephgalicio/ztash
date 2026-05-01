@@ -1,7 +1,11 @@
 import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const { DatabaseSync } = require('node:sqlite');
-const { randomUUID } = require('node:crypto');
+import { randomUUID } from 'node:crypto';
+
+// node:sqlite via createRequire — Vite/Vitest's resolver doesn't recognize
+// this stdlib module yet (it's newer than Vite's built-in node module list)
+// and tries to resolve a "sqlite" package, which doesn't exist. createRequire
+// bypasses Vite and uses Node's native resolution.
+const { DatabaseSync } = createRequire(import.meta.url)('node:sqlite');
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS items (
@@ -34,7 +38,7 @@ export function createDb(path) {
       SELECT * FROM items ORDER BY created_at DESC LIMIT ?
     `),
     listBefore: db.prepare(`
-      SELECT * FROM items WHERE created_at >= ? ORDER BY created_at DESC LIMIT ?
+      SELECT * FROM items WHERE created_at < ? ORDER BY created_at DESC LIMIT ?
     `),
     remove: db.prepare(`DELETE FROM items WHERE id = ?`),
     updateLinkTitle: db.prepare(`UPDATE items SET link_title = ? WHERE id = ?`),

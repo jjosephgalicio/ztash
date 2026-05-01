@@ -30,11 +30,11 @@ describe('items repository', () => {
     expect(hasMore).toBe(true);
   });
 
-  it('paginates with before cursor', () => {
-    const first = db.items.insert({ type: 'text', content: 'a', size: 1 });
-    db.items.insert({ type: 'text', content: 'b', size: 1 });
-    const { items } = db.items.list({ before: first.created_at + 1, limit: 1 });
-    expect(items[0].content).toBe('b');
+  it('paginates with before cursor (older items only)', () => {
+    db.items.insert({ type: 'text', content: 'a', size: 1 });
+    const second = db.items.insert({ type: 'text', content: 'b', size: 1 });
+    const { items } = db.items.list({ before: second.created_at, limit: 10 });
+    expect(items.map(i => i.content)).toEqual(['a']);
   });
 
   it('deletes an item', () => {

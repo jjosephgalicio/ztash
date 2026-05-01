@@ -313,11 +313,11 @@ describe('items repository', () => {
     expect(hasMore).toBe(true);
   });
 
-  it('paginates with before cursor', () => {
-    const first = db.items.insert({ type: 'text', content: 'a', size: 1 });
-    db.items.insert({ type: 'text', content: 'b', size: 1 });
-    const { items } = db.items.list({ before: first.created_at + 1, limit: 1 });
-    expect(items[0].content).toBe('b');
+  it('paginates with before cursor (older items only)', () => {
+    db.items.insert({ type: 'text', content: 'a', size: 1 });
+    const second = db.items.insert({ type: 'text', content: 'b', size: 1 });
+    const { items } = db.items.list({ before: second.created_at, limit: 10 });
+    expect(items.map(i => i.content)).toEqual(['a']);
   });
 
   it('deletes an item', () => {
@@ -337,8 +337,14 @@ Expected: FAIL.
 - [ ] **Step 3: Implement `server/db.js`** (uses `node:sqlite` — built-in to Node 22.5+, no native build required)
 
 ```js
-import { DatabaseSync } from 'node:sqlite';
+import { createRequire } from 'node:module';
 import { randomUUID } from 'node:crypto';
+
+// node:sqlite via createRequire — Vite/Vitest's resolver doesn't recognize
+// this stdlib module yet (it's newer than Vite's built-in node module list)
+// and tries to resolve a "sqlite" package, which doesn't exist. createRequire
+// bypasses Vite and uses Node's native resolution.
+const { DatabaseSync } = createRequire(import.meta.url)('node:sqlite');
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS items (
