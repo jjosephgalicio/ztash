@@ -115,11 +115,19 @@ All routes except `POST /api/auth` and the PWA shell require a valid `ld_session
 **SSE event format:**
 ```
 event: item:created
-data: {"id":"...","type":"image",...}
+data: {...full Item...}
+
+event: item:updated
+data: {...full Item...}    // emitted when OG title is fetched for a link
 
 event: item:deleted
 data: {"id":"..."}
+
+event: devices:changed
+data: {"count": <int>}     // emitted when a client connects or disconnects
 ```
+
+A newly-connected client receives a one-shot `devices:changed` event directly (so its UI shows the correct count immediately), then existing clients are notified via broadcast. After that, all clients receive every event.
 
 The server keeps an in-memory `Set<Response>` of connected SSE clients and broadcasts to all on every mutation. Heartbeat comment line every 25 seconds to keep proxies/intermediaries from killing idle connections.
 
