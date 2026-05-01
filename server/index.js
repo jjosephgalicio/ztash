@@ -2,6 +2,7 @@ import 'dotenv/config';
 import path from 'node:path';
 import fs from 'node:fs';
 import express from 'express';
+import qrcode from 'qrcode-terminal';
 import { fileURLToPath } from 'node:url';
 import { createDb } from './db.js';
 import { createApp } from './app.js';
@@ -48,8 +49,16 @@ if (fs.existsSync(distDir)) {
 
 app.listen(PORT, '0.0.0.0', () => {
   const lan = pickLanAddress();
+  const phoneUrl = `http://${lan}:${PORT}`;
   console.log('\n  Ztash is running.\n');
   console.log(`  Laptop:  http://localhost:${PORT}`);
-  console.log(`  Phone:   http://${lan}:${PORT}`);
+  console.log(`  Phone:   ${phoneUrl}`);
   console.log(`  PIN:     ${PIN}\n`);
+  // Print a QR for the phone URL so users don't have to type the IP.
+  // qrcode-terminal's small mode uses half-block chars and renders in
+  // ~17 rows, which fits standard terminals comfortably.
+  console.log('  Scan with your phone camera:\n');
+  qrcode.generate(phoneUrl, { small: true }, (qr) => {
+    process.stdout.write(qr.split('\n').map((line) => '  ' + line).join('\n') + '\n');
+  });
 });
