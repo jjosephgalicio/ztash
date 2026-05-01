@@ -136,7 +136,7 @@ body.screen-app .pin { display: none; }
 .card.json .bool { color: #f9a8d4; }
 
 .card.link .link-row { display: flex; align-items: center; gap: 8px; }
-.card.link img.favicon { width: 16px; height: 16px; }
+.card.link .icon-globe { color: var(--muted); flex-shrink: 0; }
 .card.link .url { color: var(--muted); font-size: 12px; word-break: break-all; }
 .card.link .title { font-weight: 500; }
 

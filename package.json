@@ -1,6 +1,6 @@
 {
   "name": "@jjosephgalicio/ztash",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Self-hosted PWA for transferring images, text, links, and JSON between your phone and laptop on the same WiFi.",
   "keywords": [
     "clipboard",

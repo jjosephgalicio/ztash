@@ -49,6 +49,11 @@ const ICONS = {
     ['path', { d: 'M3 6h18' }],
     ['path', { d: 'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2' }],
   ],
+  globe: [
+    ['circle', { cx: '12', cy: '12', r: '10' }],
+    ['path', { d: 'M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20' }],
+    ['path', { d: 'M2 12h20' }],
+  ],
 };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';

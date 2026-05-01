@@ -33,15 +33,6 @@ function escapeHtml(s) {
   return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 }
 
-function favicon(url) {
-  try {
-    const u = new URL(url);
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(u.hostname)}&sz=32`;
-  } catch {
-    return '';
-  }
-}
-
 // Legacy fallback for non-secure contexts (plain-HTTP LAN URLs).
 // navigator.clipboard is only available on HTTPS or localhost, so copying
 // over http://192.168.x.x silently fails without this.
@@ -190,15 +181,9 @@ export function renderCard(item, ctx) {
   if (item.type === 'link') {
     const row = document.createElement('div');
     row.className = 'link-row';
-    const fav = favicon(item.content);
-    if (fav) {
-      const i = document.createElement('img');
-      i.className = 'favicon'; i.src = fav; i.alt = '';
-      // Google's favicon service can't reach LAN/private IPs and 404s.
-      // Hide the broken-image icon rather than letting it render.
-      i.addEventListener('error', () => i.remove());
-      row.appendChild(i);
-    }
+    // Local Lucide globe instead of Google's s2/favicons service. Keeps
+    // every request on the user's LAN, works for private/local URLs.
+    row.appendChild(icon('globe', 16));
     const text = document.createElement('div');
     text.innerHTML = `${item.link_title ? `<div class="title">${escapeHtml(item.link_title)}</div>` : ''}<div class="url">${escapeHtml(item.content)}</div>`;
     row.appendChild(text);
