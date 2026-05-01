@@ -97,10 +97,35 @@ body.screen-app .pin { display: none; }
 .card-actions .btn { padding: 4px 10px; font-size: 12px; }
 
 .card.image img { width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius); display: block; cursor: zoom-in; }
-.feed.grid .card { padding: 0; overflow: hidden; }
-.feed.grid .card-meta, .feed.grid .card-actions { display: none; }
-.feed.grid .card.image img { max-height: 160px; height: 160px; }
-.feed.grid .card:not(.image) { display: none; }
+
+/* Grid mode: every card type renders, but compact and uniform. */
+.feed.grid .card {
+  padding: 0; overflow: hidden;
+  height: 180px; min-height: 180px;
+  display: flex; flex-direction: column;
+}
+.feed.grid .card-meta { display: none; }
+.feed.grid .card-actions { padding: 0 8px 8px; margin-top: auto; flex-shrink: 0; }
+.feed.grid .card-actions .btn { padding: 3px 8px; font-size: 11px; flex: 1; min-width: 0; }
+.feed.grid .card-actions .btn .icon { display: none; } /* keep buttons compact */
+
+.feed.grid .card.image img { height: 100%; max-height: none; flex: 1; min-height: 0; }
+.feed.grid .card.image .card-actions { background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); position: relative; margin-top: -32px; padding-top: 4px; z-index: 1; }
+
+.feed.grid .card.text,
+.feed.grid .card.json,
+.feed.grid .card.link { padding: 10px 10px 0; }
+.feed.grid .card.text pre,
+.feed.grid .card.json pre {
+  font-size: 11px; line-height: 1.4;
+  flex: 1; min-height: 0; overflow: hidden;
+  max-height: none;
+  display: -webkit-box; -webkit-line-clamp: 9; line-clamp: 9; -webkit-box-orient: vertical;
+}
+.feed.grid .card.link .link-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+.feed.grid .card.link .url { font-size: 11px; }
+.feed.grid .card.link .title { font-size: 13px; line-height: 1.25; }
+.feed.grid .card.link > .link-row { flex: 1; min-height: 0; overflow: hidden; }
 
 .card.text pre, .card.json pre { margin: 0; font-family: ui-monospace, monospace; font-size: 13px;
   white-space: pre-wrap; word-break: break-word; max-height: calc(1.4em * 4); overflow: hidden; }

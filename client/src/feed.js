@@ -99,12 +99,8 @@ export function setupFeed({ lightbox }) {
     isGrid = !isGrid;
     feed.classList.toggle('grid', isGrid);
     viewToggle.replaceChildren(icon(isGrid ? 'list' : 'layout-grid'));
-    if (isGrid) {
-      // auto-activate Images filter
-      chips.forEach((c) => c.classList.toggle('active', c.dataset.filter === 'image'));
-      currentFilter = 'image';
-      applyFilter();
-    }
+    // Grid is a layout, not a filter — leave the active filter chip
+    // alone so users can still scope to a single type if they want.
   });
 
   function connectSse() {
