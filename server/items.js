@@ -27,5 +27,18 @@ export function createItemsRouter({ db, broadcast = () => {} }) {
       broadcast('item:deleted', { id: req.params.id });
       res.status(204).end();
     },
+
+    uploadHandler(req, res) {
+      if (!req.file) return res.status(400).json({ error: 'no_file' });
+      const item = db.items.insert({
+        type: 'image',
+        content: req.file.filename,
+        mime: req.file.mimetype,
+        size: req.file.size,
+        original_filename: req.file.originalname,
+      });
+      broadcast('item:created', item);
+      res.status(201).json(item);
+    },
   };
 }
