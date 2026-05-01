@@ -48,6 +48,45 @@ describe('uploads', () => {
     expect(res.body.error).toBe('only_images');
   });
 
+  it('rejects SVG uploads (XSS vector)', async () => {
+    // SVG can carry inline <script> that runs in the page's same-origin
+    // context, with the auth cookie. Even though the MIME starts with
+    // image/, we explicitly deny it.
+    const cookie = await authed();
+    const svg = Buffer.from(
+      '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'
+    );
+    const res = await request(app).post('/api/items').set('Cookie', cookie)
+      .attach('file', svg, { filename: 'evil.svg', contentType: 'image/svg+xml' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('only_images');
+  });
+
+  it('rejects BMP uploads (not in the allowlist)', async () => {
+    const cookie = await authed();
+    const res = await request(app).post('/api/items').set('Cookie', cookie)
+      .attach('file', Buffer.alloc(64), { filename: 'a.bmp', contentType: 'image/bmp' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('only_images');
+  });
+
+  it('accepts the common image formats: png, jpeg, gif, webp, avif', async () => {
+    const cookie = await authed();
+    const png = Buffer.from(
+      '89504E470D0A1A0A0000000D49484452000000010000000108060000001F15C489' +
+      '0000000A49444154789C63000100000500010DCAE9510000000049454E44AE426082',
+      'hex'
+    );
+    for (const mime of ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/avif']) {
+      // We only verify the filter (multer's mimetype check), so the bytes
+      // can stay as-is — multer doesn't sniff content.
+      const res = await request(app).post('/api/items').set('Cookie', cookie)
+        .attach('file', png, { filename: `x.${mime.split('/')[1]}`, contentType: mime });
+      expect(res.status, `mime=${mime}`).toBe(201);
+      expect(res.body.mime).toBe(mime);
+    }
+  });
+
   it('rejects files over size limit', async () => {
     const cookie = await authed();
     const big = Buffer.alloc(1024 * 11, 0); // > maxUploadBytes

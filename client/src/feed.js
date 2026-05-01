@@ -109,8 +109,37 @@ export function setupFeed({ lightbox }) {
 
   function connectSse() {
     const es = new EventSource('/api/events');
-    es.addEventListener('open', () => connDot.classList.remove('disconnected'));
-    es.addEventListener('error', () => connDot.classList.add('disconnected'));
+    // EventSource fires "error" on every transient retry, which is too
+    // chatty to probe on. Wait until we've been disconnected for a few
+    // seconds before checking whether our session is still valid; on a
+    // 401 the server has been restarted (in-memory sessions wiped) and
+    // we need to reload to show the PIN screen again.
+    let probeTimer = null;
+    const cancelProbe = () => {
+      if (probeTimer) { clearTimeout(probeTimer); probeTimer = null; }
+    };
+    const scheduleProbe = () => {
+      if (probeTimer) return;
+      probeTimer = setTimeout(async () => {
+        probeTimer = null;
+        try {
+          await api.listItems({ limit: 1 });
+        } catch (err) {
+          if (err.status === 401) {
+            es.close();
+            location.reload();
+          }
+        }
+      }, 5000);
+    };
+    es.addEventListener('open', () => {
+      connDot.classList.remove('disconnected');
+      cancelProbe();
+    });
+    es.addEventListener('error', () => {
+      connDot.classList.add('disconnected');
+      scheduleProbe();
+    });
     es.addEventListener('item:created', (e) => prepend(JSON.parse(e.data)));
     es.addEventListener('item:deleted', (e) => remove(JSON.parse(e.data).id));
     es.addEventListener('item:updated', (e) => update(JSON.parse(e.data)));
