@@ -15,7 +15,7 @@ export async function fetchTitle(url, { timeoutMs = 3000 } = {}) {
     const res = await fetch(url, {
       signal: controller.signal,
       redirect: 'follow',
-      headers: { 'user-agent': 'LocalDrop/0.1' },
+      headers: { 'user-agent': 'Ztash/0.1' },
     });
     if (!res.ok) return null;
     const html = await res.text();

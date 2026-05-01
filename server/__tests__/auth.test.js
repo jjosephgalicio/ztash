@@ -18,7 +18,7 @@ describe('auth', () => {
   it('accepts correct PIN and sets session cookie', async () => {
     const res = await request(app).post('/api/auth').send({ pin: '123456' });
     expect(res.status).toBe(200);
-    expect(res.headers['set-cookie']?.[0]).toMatch(/ld_session=/);
+    expect(res.headers['set-cookie']?.[0]).toMatch(/ztash_session=/);
     expect(res.headers['set-cookie']?.[0]).toMatch(/HttpOnly/);
   });
 

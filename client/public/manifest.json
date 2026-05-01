@@ -1,6 +1,6 @@
 {
-  "name": "LocalDrop",
-  "short_name": "LocalDrop",
+  "name": "Ztash",
+  "short_name": "Ztash",
   "description": "Self-hosted clipboard for your devices on the same WiFi.",
   "start_url": "/",
   "display": "standalone",

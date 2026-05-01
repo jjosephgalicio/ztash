@@ -1,4 +1,4 @@
-# LocalDrop — Design Spec
+# Ztash — Design Spec
 
 **Date:** 2026-05-01
 **Status:** Approved (pending written-spec review)
@@ -101,11 +101,11 @@ CREATE INDEX idx_items_created_at ON items(created_at DESC);
 
 ## 6. API
 
-All routes except `POST /api/auth` and the PWA shell require a valid `ld_session` cookie. Missing/invalid cookie returns 401.
+All routes except `POST /api/auth` and the PWA shell require a valid `ztash_session` cookie. Missing/invalid cookie returns 401.
 
 | Method | Path | Body | Returns |
 |---|---|---|---|
-| `POST` | `/api/auth` | `{ pin: string }` | 200 + `Set-Cookie: ld_session=…` on match, 401 otherwise |
+| `POST` | `/api/auth` | `{ pin: string }` | 200 + `Set-Cookie: ztash_session=…` on match, 401 otherwise |
 | `GET` | `/api/items` | — | `{ items: Item[], hasMore: boolean }` newest first, paginated by `?before=<ms>&limit=50` (default limit 50, max 200). Client uses a "Load more" button at the bottom of the feed when `hasMore` is true. |
 | `POST` | `/api/items` | `{ content: string }` (JSON) **or** multipart with `file` field | 201 + the created `Item` |
 | `DELETE` | `/api/items/:id` | — | 204 on success, 404 if not found |
@@ -137,7 +137,7 @@ The server keeps an in-memory `Set<Response>` of connected SSE clients and broad
 
 - PIN is stored in `.env` as `PIN=123456` (4–6 digits, validated at startup).
 - `POST /api/auth` compares submitted PIN with stored PIN using a constant-time compare.
-- On match, server sets `ld_session=<random-32-byte-hex>` as `httpOnly`, `SameSite=Lax`, `Secure` only if served over HTTPS.
+- On match, server sets `ztash_session=<random-32-byte-hex>` as `httpOnly`, `SameSite=Lax`, `Secure` only if served over HTTPS.
 - The session token is also stored server-side in a `Set<string>` (in-memory). Restart invalidates all sessions — acceptable for a personal tool.
 - Rate limit: 5 failed PIN attempts per IP within 60 seconds returns 429 with a 60-second lockout.
 - No logout button in v1 (clear cookies in browser).
@@ -150,7 +150,7 @@ Mobile-first, max content width 720px on desktop, centered.
 
 ```
 ┌─────────────────────────────────────────┐
-│ ◉ LocalDrop          • 2 devices  ⋯    │  header
+│ ◉ Ztash              • 2 devices  ⋯    │  header
 ├─────────────────────────────────────────┤
 │  ╔══════════════╗  ╔══════════════╗    │
 │  ║  ⬆  Upload   ║  ║  ✎  Paste    ║    │  primary actions
@@ -204,7 +204,7 @@ Full-screen centered card on first visit. Six 1-digit input boxes (auto-advance 
 
 ## 9. PWA
 
-- `manifest.json` with name "LocalDrop", short_name "LocalDrop", icon set (192/512), `display: standalone`, theme color matching the dark surface, start_url `/`.
+- `manifest.json` with name "Ztash", short_name "Ztash", icon set (192/512), `display: standalone`, theme color matching the dark surface, start_url `/`.
 - Service worker with cache-first for the app shell (HTML/JS/CSS/icons) and network-only for `/api/*`.
 - Service worker version is the build hash; old caches are deleted on activate.
 - iOS Safari constraint: PWA install requires HTTPS. Over plain HTTP on LAN, the page still works fully but Add-to-Home-Screen will be a regular bookmark, not a standalone PWA. Accepted limitation; documented in the README.
@@ -218,7 +218,7 @@ local-repo/
 ├── package.json
 ├── README.md
 ├── docs/
-│   └── superpowers/specs/2026-05-01-localdrop-design.md
+│   └── superpowers/specs/2026-05-01-ztash-design.md
 ├── server/
 │   ├── index.js              # entry, prints LAN URL + PIN
 │   ├── app.js                # express app wiring
@@ -244,7 +244,7 @@ local-repo/
 │       └── style.css
 ├── uploads/                  # gitignored
 └── data/
-    └── localdrop.sqlite      # gitignored
+    └── ztash.sqlite          # gitignored
 ```
 
 ## 11. Configuration (.env)

@@ -25,7 +25,7 @@ fs.mkdirSync(DATA_DIR, { recursive: true });
 const uploadsDir = path.join(DATA_DIR, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
 
-const db = createDb(path.join(DATA_DIR, 'localdrop.sqlite'));
+const db = createDb(path.join(DATA_DIR, 'ztash.sqlite'));
 const sse = createSseHub();
 
 const app = createApp({
@@ -48,7 +48,7 @@ if (fs.existsSync(distDir)) {
 
 app.listen(PORT, '0.0.0.0', () => {
   const lan = pickLanAddress();
-  console.log('\n  LocalDrop is running.\n');
+  console.log('\n  Ztash is running.\n');
   console.log(`  Laptop:  http://localhost:${PORT}`);
   console.log(`  Phone:   http://${lan}:${PORT}`);
   console.log(`  PIN:     ${PIN}\n`);

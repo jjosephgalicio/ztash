@@ -1,6 +1,6 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 
-const SESSION_COOKIE = 'ld_session';
+const SESSION_COOKIE = 'ztash_session';
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX_FAILS = 5;
 

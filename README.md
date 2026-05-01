@@ -1,4 +1,4 @@
-# LocalDrop
+# Ztash
 
 A self-hosted PWA for transferring images, text, links, and JSON between your phone and laptop on the same WiFi network.
 
@@ -45,7 +45,7 @@ npm test
 
 - iOS Safari requires HTTPS to install as a PWA. Over plain HTTP on LAN the app still works fully but Add-to-Home-Screen will be a regular bookmark, not a standalone PWA.
 - Only images can be uploaded as files. Text, links, and JSON go through the Paste button.
-- All items are stored unencrypted on the laptop (LAN-only access, but the data lives in `data/localdrop.sqlite` and `data/uploads/`).
+- All items are stored unencrypted on the laptop (LAN-only access, but the data lives in `data/ztash.sqlite` and `data/uploads/`).
 
 ## Configuration
 

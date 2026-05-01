@@ -1,5 +1,5 @@
 const VERSION = 'v1';
-const SHELL_CACHE = `localdrop-shell-${VERSION}`;
+const SHELL_CACHE = `ztash-shell-${VERSION}`;
 const SHELL_ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', (e) => {
