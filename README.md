@@ -9,7 +9,7 @@ Runs locally on your machine. No accounts, no cloud, no fees. Your storage, your
 ## Quick start
 
 ```sh
-npx ztash
+npx @jjosephgalicio/ztash
 ```
 
 That's it. First run prompts for a 4–6 digit PIN and saves it to `~/.ztash/.pin`. Ztash prints two URLs:
@@ -27,7 +27,7 @@ Requires **Node.js 22.5 or newer** (Ztash uses `node:sqlite` from stdlib — no 
 ## CLI flags
 
 ```
-npx ztash [options]
+npx @jjosephgalicio/ztash [options]
 
   --pin <code>       Override the saved PIN (4-6 digits)
   --port <port>      HTTP port (default 4123)
