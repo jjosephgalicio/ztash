@@ -47,7 +47,7 @@ if (fs.existsSync(distDir)) {
   console.warn('NOTE: dist/ not found. Run `npm run build` first, or use `npm run dev:client` for development.');
 }
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   const lan = pickLanAddress();
   const phoneUrl = `http://${lan}:${PORT}`;
   console.log('\n  Ztash is running.\n');
@@ -61,4 +61,21 @@ app.listen(PORT, '0.0.0.0', () => {
   qrcode.generate(phoneUrl, { small: true }, (qr) => {
     process.stdout.write(qr.split('\n').map((line) => '  ' + line).join('\n') + '\n');
   });
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\n  ERROR: port ${PORT} is already in use.`);
+    console.error('  Another Ztash (or some other app) is already listening here.');
+    console.error('  Pick a different port:');
+    console.error(`    npx @jjosephgalicio/ztash --port ${PORT + 1}`);
+    console.error('  ...or stop whatever is holding the port and try again.\n');
+    process.exit(1);
+  }
+  if (err.code === 'EACCES') {
+    console.error(`\n  ERROR: not allowed to listen on port ${PORT}.`);
+    console.error('  Ports below 1024 require admin privileges; pick something higher.\n');
+    process.exit(1);
+  }
+  throw err;
 });
