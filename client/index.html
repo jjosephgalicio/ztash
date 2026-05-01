@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#15171c" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <title>LocalDrop</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="screen-pin">
+  <!-- PIN screen -->
+  <section class="pin">
+    <div class="pin-card">
+      <h1>LocalDrop</h1>
+      <p class="muted">Enter your PIN</p>
+      <form id="pin-form" autocomplete="off" novalidate>
+        <div class="pin-inputs" id="pin-inputs">
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+          <input maxlength="1" inputmode="numeric" />
+        </div>
+        <button type="submit" class="btn primary">Unlock</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Main app -->
+  <main class="app" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="dot" id="conn-dot"></span> LocalDrop</div>
+      <div class="meta"><span id="device-count">1</span> device<span id="device-plural">s</span></div>
+    </header>
+
+    <div class="actions">
+      <button class="btn primary" id="btn-upload">⬆ Upload</button>
+      <button class="btn primary" id="btn-paste">✎ Paste</button>
+      <input type="file" id="file-input" accept="image/*" multiple hidden />
+    </div>
+
+    <div class="filterbar">
+      <div class="chips" id="filter-chips">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="image">Images</button>
+        <button class="chip" data-filter="text">Text</button>
+        <button class="chip" data-filter="link">Links</button>
+        <button class="chip" data-filter="json">JSON</button>
+      </div>
+      <button class="view-toggle" id="view-toggle" title="Toggle grid">⊞</button>
+    </div>
+
+    <section class="composer" id="composer" hidden>
+      <textarea id="composer-text" placeholder="Paste or type — links, JSON, or plain text"></textarea>
+      <div class="composer-row">
+        <span class="badge" id="composer-badge">Text</span>
+        <button class="btn ghost" id="composer-cancel">Cancel</button>
+        <button class="btn primary" id="composer-send">Send</button>
+      </div>
+    </section>
+
+    <section class="feed" id="feed"></section>
+    <button class="btn ghost load-more" id="load-more" hidden>Load more</button>
+
+    <div class="dropzone" id="dropzone">
+      <div>Drop images to upload</div>
+    </div>
+  </main>
+
+  <div id="toast-host" class="toast-host"></div>
+  <div class="lightbox" id="lightbox" hidden><img id="lightbox-img" alt="" /></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
