@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import readline from 'node:readline/promises';
@@ -22,6 +22,7 @@ Options:
   --pin <code>        Override the saved PIN (4-6 digits)
   --port <port>       HTTP port (default 4123)
   --data-dir <path>   Where to store sqlite + uploads (default ~/.ztash)
+  --stop, --kill      Stop the running Ztash (sends SIGTERM by pid file)
   --help, -h          Show this help
   --version, -v       Print version
 
@@ -39,6 +40,37 @@ if (args.includes('--version') || args.includes('-v')) {
 
 const dataDir = path.resolve(flag('--data-dir') || path.join(os.homedir(), '.ztash'));
 mkdirSync(dataDir, { recursive: true });
+
+if (args.includes('--stop') || args.includes('--kill')) {
+  const pidFile = path.join(dataDir, 'ztash.pid');
+  if (!existsSync(pidFile)) {
+    stdout.write(`No running Ztash found (no pid file at ${pidFile}).\n`);
+    process.exit(0);
+  }
+  const pid = Number(readFileSync(pidFile, 'utf8').trim());
+  if (!pid) {
+    stdout.write(`Stale pid file at ${pidFile}, removing.\n`);
+    try { unlinkSync(pidFile); } catch { /* ignore */ }
+    process.exit(0);
+  }
+  try {
+    process.kill(pid, 'SIGTERM');
+    // On Windows SIGTERM is a force-kill so the running process can't
+    // clean up its own pid file. Do it for them. (Harmless if the
+    // running process beats us to it.)
+    try { unlinkSync(pidFile); } catch { /* ignore */ }
+    stdout.write(`Stopped Ztash (pid ${pid}).\n`);
+    process.exit(0);
+  } catch (err) {
+    if (err.code === 'ESRCH') {
+      stdout.write(`No process with pid ${pid}. Cleaning up stale pid file.\n`);
+      try { unlinkSync(pidFile); } catch { /* ignore */ }
+      process.exit(0);
+    }
+    stderr.write(`Error stopping pid ${pid}: ${err.message}\n`);
+    process.exit(1);
+  }
+}
 
 async function resolvePin() {
   const cliPin = flag('--pin');

@@ -162,6 +162,14 @@
           <h3>Installable PWA</h3>
           <p>Add to your phone's home screen and it feels like a native app. Dark theme, mobile-first, ~16 KB JS.</p>
         </div>
+        <div class="feature">
+          <h3>QR onboarding</h3>
+          <p>The startup banner prints a QR code of the phone URL. Scan with your phone camera — no typing 192.168.x.x.</p>
+        </div>
+        <div class="feature">
+          <h3>One-shot kill switch</h3>
+          <p>Forgot Ztash is running? <code>npx @jjosephgalicio/ztash --stop</code> from any terminal frees the port.</p>
+        </div>
       </div>
     </section>
 
@@ -170,8 +178,9 @@
       <ol class="steps">
         <li>Install <code>Node.js 22.5</code> or newer if you don't have it.</li>
         <li>In a terminal on your laptop, run <code>npx @jjosephgalicio/ztash</code>. Set a 4–6 digit PIN when prompted.</li>
-        <li>Ztash prints two URLs — <code>http://localhost:4123</code> for your laptop, and a <code>http://192.168.x.x:4123</code> address for your phone.</li>
-        <li>Open the phone URL on your phone (same WiFi as the laptop), enter the PIN, and start sending.</li>
+        <li>Ztash prints the URLs and a QR code. <code>http://localhost:4123</code> is for the laptop browser; the QR (or the printed <code>http://192.168.x.x:4123</code>) is for your phone.</li>
+        <li>On your phone (same WiFi), point the camera at the QR or open the printed URL, enter the PIN, and start sending.</li>
+        <li>When you're done, <code>Ctrl+C</code> in the terminal stops it. Or from anywhere: <code>npx @jjosephgalicio/ztash --stop</code>.</li>
       </ol>
     </section>
 

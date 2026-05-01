@@ -47,21 +47,34 @@ if (fs.existsSync(distDir)) {
   console.warn('NOTE: dist/ not found. Run `npm run build` first, or use `npm run dev:client` for development.');
 }
 
+// PID file lets `ztash --stop` find this process later. On graceful exit
+// we remove it; if the process is force-killed (Windows), the next start
+// or --stop call cleans up.
+const pidFile = path.join(DATA_DIR, 'ztash.pid');
+
 const server = app.listen(PORT, '0.0.0.0', () => {
+  fs.writeFileSync(pidFile, String(process.pid));
   const lan = pickLanAddress();
   const phoneUrl = `http://${lan}:${PORT}`;
   console.log('\n  Ztash is running.\n');
   console.log(`  Laptop:  http://localhost:${PORT}`);
   console.log(`  Phone:   ${phoneUrl}`);
   console.log(`  PIN:     ${PIN}\n`);
-  // Print a QR for the phone URL so users don't have to type the IP.
-  // qrcode-terminal's small mode uses half-block chars and renders in
-  // ~17 rows, which fits standard terminals comfortably.
   console.log('  Scan with your phone camera:\n');
   qrcode.generate(phoneUrl, { small: true }, (qr) => {
     process.stdout.write(qr.split('\n').map((line) => '  ' + line).join('\n') + '\n');
+    console.log('\n  Press Ctrl+C to stop, or run `npx @jjosephgalicio/ztash --stop` from another terminal.\n');
   });
 });
+
+function shutdown() {
+  try { fs.unlinkSync(pidFile); } catch { /* may already be gone */ }
+  server.close(() => process.exit(0));
+  // Force exit after 2s in case open SSE connections delay close().
+  setTimeout(() => process.exit(0), 2000).unref();
+}
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {

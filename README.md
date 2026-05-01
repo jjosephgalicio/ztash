@@ -32,9 +32,12 @@ npx @jjosephgalicio/ztash [options]
   --pin <code>       Override the saved PIN (4-6 digits)
   --port <port>      HTTP port (default 4123)
   --data-dir <path>  Where to store sqlite + uploads (default ~/.ztash)
+  --stop, --kill     Stop the running Ztash (sends SIGTERM by pid file)
   --version          Print version
   --help             Show help
 ```
+
+A QR code of the phone URL is printed in the startup banner — scan with your phone camera and the page opens.
 
 ## Limitations
 
