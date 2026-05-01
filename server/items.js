@@ -1,4 +1,5 @@
 import { detectType } from './typeDetect.js';
+import { fetchTitle as fetchTitleAsync } from './ogTitle.js';
 
 export function createItemsRouter({ db, broadcast = () => {} }) {
   return {
@@ -13,6 +14,14 @@ export function createItemsRouter({ db, broadcast = () => {} }) {
       });
       broadcast('item:created', item);
       res.status(201).json(item);
+
+      if (type === 'link') {
+        fetchTitleAsync(content).then((title) => {
+          if (!title) return;
+          db.items.updateLinkTitle(item.id, title);
+          broadcast('item:updated', { ...item, link_title: title });
+        });
+      }
     },
 
     list(req, res) {

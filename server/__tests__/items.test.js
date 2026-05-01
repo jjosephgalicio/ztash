@@ -2,6 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../app.js';
 import { createDb } from '../db.js';
+import { vi, beforeAll, afterAll } from 'vitest';
+beforeAll(() => { vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false })); });
+afterAll(() => { vi.unstubAllGlobals(); });
 
 async function authed(app) {
   const auth = await request(app).post('/api/auth').send({ pin: '123456' });
